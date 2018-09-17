@@ -33,7 +33,7 @@ module.exports = {
 ## Options
 * `include` (`exclude`)
 List of regular expressions of filepaths to validate (skip)
-```
+```javascript
 {
   loader: "bem-validator-loader",
   options: {
@@ -44,7 +44,7 @@ List of regular expressions of filepaths to validate (skip)
 
 * `webpackDirectories`
 Callback to calculate list of directories for bem module checking
-```
+```javascript
 {
   loader: "bem-validator-loader",
   options: {
@@ -60,7 +60,7 @@ Callback to calculate list of directories for bem module checking
 
 * `onError`
 Callback to catch errors. For example to replace all errors with warnings
-```
+```javascript
 {
   loader: "bem-validator-loader",
   options: {
