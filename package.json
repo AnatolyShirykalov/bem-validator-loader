@@ -1,0 +1,11 @@
+{
+  "name": "bem-validator-loader",
+  "version": "0.0.1",
+  "description": "bem validator for webpack",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "css": "^2.2.4",
+    "loader-utils": "^1.1.0"
+  }
+}
