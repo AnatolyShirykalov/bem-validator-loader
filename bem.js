@@ -17,7 +17,8 @@ var bem = {
         rule2: 'BEM Block names may consist of Latin letters, digits, and dashes',
         rule3: 'Modifier of a modifier is not allowed',
         rule4: 'BEM block structure should be flattened',
-        rule5: 'BEM selectors only allow elements based on block-level modifiers to have multiple rules'
+        rule5: 'BEM selectors only allow elements based on block-level modifiers to have multiple rules',
+        rule6: 'Selector must begin with the block name'
     },
     errors: new Array(),
     blocks: {},
@@ -38,9 +39,13 @@ var bem = {
     ismedia: function(rule) {
         return rule.type == 'media';
     },
-    checkselector: function(rule, selector, options) {
-        if (options.filename && !(new Regexp(`^\.${path.basename(path.dirname(options.filename))}`).test(selector))) {
-          this.adderror(rule, this.bemrules.rule6, "Another selector found", "Use prefix")
+    checkselector: function(rule, selector, options = {}) {
+        if (options.filename && options.webpackDirectories) {
+            const dirs = options.webpackDirectories(path.dirname(options.filename))
+            const prefix = dirs.join("__")
+            if (!(new RegExp(`^\.${prefix}`).test(selector))) {
+                this.adderror(rule, this.bemrules.rule6, "Another selector found", `Use prefix ${prefix}`)
+            }
         }
         if (/^\#(.+)/g.test(selector)) {
             this.adderror(rule, this.bemrules.rule0, 'ID found', 'Use .block-name, instead of ' + selector);

@@ -16,15 +16,39 @@ const needToCheck = (options, path) => {
 }
 
 const mkError = (fn, errors) => {
-  return `${fn}\n${JSON.stringify(errors, null, 2)}\n\n`
+  return errors.map((error => {
+    const {start, end} = error.position
+    return (
+      `  ERROR IN ${fn}:L${start.line}:C${start.column}--L${end.line}:C${end.column}\n`+
+      `    selector: ${(error.selectors || []).join(',')}\n`+
+      `    violation: ${error.violation}\n`+
+      `    error: ${error.error}\n`+
+      `    example: ${error.example}\n`
+    )
+  })).join("\n")
+}
+
+const defaultWebpackDirectories = fullpath => {
+  const dirs = fullpath.split('/')
+  const i = dirs.indexOf('webpack')
+  return dirs.filter((dir, I) => I > i +1 )
 }
 
 module.exports = function(source) {
   const options = getOptions(this);
+
   if(needToCheck(options, this.resourcePath)) {
-    const errors = bem.parse(source).Errors
+
+    const errors = bem.parse(source, {
+      filename: this.resourcePath,
+      webpackDirectories: options.webpackDirectories || defaultWebpackDirectories
+    }).Errors
+
     if (!errors || errors.length === 0) return source;
-    throw new Error(mkError(this.resourcePath, errors))
+    const error = mkError(this.resourcePath, errors)
+    if (options.onError) options.onError(error, {this: this, filename: this.resourcePath})
+    else throw new Error(error)
   }
+
   return source
 }
