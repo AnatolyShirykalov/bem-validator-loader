@@ -19,7 +19,7 @@ const mkError = (fn, errors) => {
   return errors.map((error => {
     const {start, end} = error.position
     return (
-      `  ERROR IN ${fn}:L${start.line}:C${start.column}--L${end.line}:C${end.column}\n`+
+      `  BEM validation error in ${fn}:L${start.line}:C${start.column}--L${end.line}:C${end.column}\n`+
       `    selector: ${(error.selectors || []).join(',')}\n`+
       `    violation: ${error.violation}\n`+
       `    error: ${error.error}\n`+
