@@ -43,7 +43,8 @@ var bem = {
         if (options.filename && options.webpackDirectories) {
             const dirs = options.webpackDirectories(path.dirname(options.filename))
             const prefix = dirs.join("__")
-            if (!(new RegExp(`^\.${prefix}`).test(selector))) {
+            const prefix_last = dirs[dirs.length - 1]
+            if (!(new RegExp(`^\.(${prefix}|${prefix_last})`).test(selector))) {
                 this.adderror(rule, this.bemrules.rule6, "Another selector found", `Use prefix ${prefix}`)
             }
         }
