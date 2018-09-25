@@ -34,7 +34,7 @@ const defaultWebpackDirectories = fullpath => {
   return dirs.filter((dir, I) => I > i +1 )
 }
 
-module.exports = function(source) {
+module.exports = function(source, map, meta) {
   const options = getOptions(this);
 
   if(needToCheck(options, this.resourcePath)) {
@@ -44,11 +44,15 @@ module.exports = function(source) {
       webpackDirectories: options.webpackDirectories || defaultWebpackDirectories
     }).Errors
 
-    if (!errors || errors.length === 0) return source;
+    if (!errors || errors.length === 0) {
+      this.callback(null, source, map, meta)
+      return null;
+    }
     const error = mkError(this.resourcePath, errors)
     if (options.onError) options.onError(error, {this: this, filename: this.resourcePath})
     else throw new Error(error)
   }
 
-  return source
+  this.callback(null, source, map, meta)
+  return null;
 }
