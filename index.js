@@ -1,17 +1,18 @@
 const { getOptions } = require('loader-utils');
 const bem = require('./bem')
+const path = require('path')
 
 const toArray = (option=[]) => {
   if (!Array.isArray(option)) return [option]
   return option
 }
 
-const needToCheck = (options, path) => {
+const needToCheck = (options, fullpath) => {
   const incs = toArray(options.include)
   const excs = toArray(options.exclude)
   return (
-    (incs.length == 0 || !incs.map(ptrn => !path.match(ptrn)).reduce((s, a) => s && a)) &&
-    (excs.length == 0 || !excs.map(ptrn =>  path.match(ptrn)).reduce((s, a) => s || a))
+    (incs.length == 0 || !incs.map(ptrn => !fullpath.match(ptrn)).reduce((s, a) => s && a)) &&
+    (excs.length == 0 || !excs.map(ptrn =>  fullpath.match(ptrn)).reduce((s, a) => s || a))
   )
 }
 
@@ -29,7 +30,7 @@ const mkError = (fn, errors) => {
 }
 
 const defaultWebpackDirectories = fullpath => {
-  const dirs = fullpath.split('/')
+  const dirs = fullpath.split(path.sep)
   const i = dirs.indexOf('webpack')
   return dirs.filter((dir, I) => I > i +1 )
 }
@@ -37,7 +38,7 @@ const defaultWebpackDirectories = fullpath => {
 module.exports = function(source, map, meta) {
   const options = getOptions(this);
 
-  if(needToCheck(options, this.resourcePath)) {
+  if (needToCheck(options, this.resourcePath)) {
 
     const errors = bem.parse(source, {
       filename: this.resourcePath,
@@ -49,8 +50,11 @@ module.exports = function(source, map, meta) {
       return null;
     }
     const error = mkError(this.resourcePath, errors)
-    if (options.onError) options.onError(error, {this: this, filename: this.resourcePath})
-    else throw new Error(error)
+    if (options.onError) {
+      options.onError(error, {this: this, filename: this.resourcePath})
+    } else {
+      throw new Error(error)
+    }
   }
 
   this.callback(null, source, map, meta)
