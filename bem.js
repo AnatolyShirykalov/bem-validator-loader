@@ -41,7 +41,11 @@ var bem = {
     },
     checkselector: function(rule, selector, options = {}) {
         if (options.filename && options.webpackDirectories) {
-            const dirs = options.webpackDirectories(path.dirname(options.filename))
+            const fd = path.parse(options.filename);
+            const dirs = options.webpackDirectories(fd.dir);
+            if (fd.name !== 'index') {
+              dirs.push(fd.name);
+            }
             const prefix = dirs.join("__")
             const prefix_last = dirs[dirs.length - 1]
             if (!(new RegExp(`^\.(${prefix}|${prefix_last})`).test(selector))) {
